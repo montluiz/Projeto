@@ -1,0 +1,387 @@
+/* Panel/table styles moved to data-panel.css */
+@import "../../styles/modern-admin.css";
+
+.mov-wrapper {
+  min-height: 100vh;
+  display: flex;
+}
+
+.mov-page {
+  flex: 1;
+  min-width: 0;
+  min-height: 100vh;
+  padding: 28px;
+  background:
+    radial-gradient(circle at top left, rgba(250, 204, 21, 0.08), transparent 30%),
+    linear-gradient(180deg, #f7f7f9 0%, #f2f3f6 100%);
+  color: #111827;
+}
+
+.mov-topbar,
+.mov-hero,
+.mov-panel {
+  max-width: 1240px;
+  margin: 0 auto;
+}
+
+.mov-topbar {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.mov-title-block {
+  display: grid;
+  gap: 8px;
+}
+
+.mov-title-block h1,
+.mov-hero-copy h2,
+.mov-state h3 {
+  margin: 0;
+}
+
+.mov-title-block h1 {
+  font-size: clamp(28px, 3vw, 38px);
+  letter-spacing: -0.03em;
+}
+
+.mov-title-block p,
+.mov-hero-copy p,
+.mov-state p {
+  margin: 0;
+  color: #5f6470;
+  line-height: 1.6;
+}
+
+.mov-chip {
+  width: fit-content;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(17, 24, 39, 0.92);
+  color: #ffd400;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.mov-topbar-actions {
+  display: flex;
+  align-items: center;
+}
+
+.mov-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(320px, 0.9fr);
+  gap: 18px;
+  margin-bottom: 20px;
+}
+
+.mov-hero-copy,
+.mov-panel,
+.mov-card {
+  background: rgba(255, 255, 255, 0.88);
+  border: 1px solid rgba(17, 24, 39, 0.08);
+  box-shadow: 0 18px 45px rgba(17, 24, 39, 0.06);
+  backdrop-filter: blur(10px);
+}
+
+.mov-hero-copy {
+  border-radius: 24px;
+  padding: 28px;
+}
+
+.mov-kicker {
+  margin-bottom: 10px;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: #8a6c00;
+}
+
+.mov-hero-copy h2 {
+  font-size: clamp(24px, 2.5vw, 34px);
+  letter-spacing: -0.03em;
+}
+
+.mov-hero-copy p {
+  margin-top: 12px;
+  max-width: 60ch;
+}
+
+.mov-stats {
+  display: grid;
+  gap: 14px;
+}
+
+.mov-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 20px;
+  border-radius: 20px;
+}
+
+.mov-card p {
+  margin: 0 0 4px;
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.mov-card strong {
+  display: block;
+  font-size: 22px;
+  letter-spacing: -0.03em;
+}
+
+.mov-card-icon {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 16px;
+  background: #f4f5f7;
+  color: #111827;
+  flex: none;
+}
+
+.mov-card.entrada .mov-card-icon {
+  background: rgba(34, 197, 94, 0.12);
+  color: #16a34a;
+}
+
+.mov-card.saida .mov-card-icon {
+  background: rgba(239, 68, 68, 0.12);
+  color: #dc2626;
+}
+
+.mov-card.saldo .mov-card-icon {
+  background: rgba(250, 204, 21, 0.18);
+  color: #a16207;
+}
+
+.mov-panel {
+  border-radius: 24px;
+  padding: 20px;
+}
+
+.mov-filters {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 220px auto;
+  gap: 14px;
+  align-items: end;
+  margin-bottom: 18px;
+}
+
+.mov-search,
+.mov-select-group select,
+.mov-summary-pill {
+  min-height: 48px;
+  border-radius: 14px;
+}
+
+.mov-search {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 14px;
+  border: 1px solid rgba(17, 24, 39, 0.1);
+  background: #fff;
+}
+
+.mov-search svg {
+  flex: none;
+  color: #7a7f8c;
+}
+
+.mov-search input,
+.mov-select-group select {
+  width: 100%;
+  border: 0;
+  outline: none;
+  background: transparent;
+  color: #111827;
+  font-size: 14px;
+}
+
+.mov-select-group {
+  display: grid;
+  gap: 6px;
+}
+
+.mov-select-group label {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #6b7280;
+}
+
+.mov-select-group select {
+  padding: 0 14px;
+  border: 1px solid rgba(17, 24, 39, 0.1);
+  background: #fff;
+}
+
+.mov-summary-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 16px;
+  border: 1px solid rgba(17, 24, 39, 0.08);
+  background: rgba(17, 24, 39, 0.94);
+  color: #ffd400;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.mov-table-card {
+  overflow: hidden;
+  border-radius: 20px;
+  border: 1px solid rgba(17, 24, 39, 0.08);
+  background: #fff;
+}
+
+.mov-table-wrap {
+  overflow-x: auto;
+}
+
+.mov-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.mov-table th,
+.mov-table td {
+  padding: 16px 18px;
+  text-align: left;
+  border-bottom: 1px solid #eceef3;
+  white-space: nowrap;
+}
+
+.mov-table th {
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #717784;
+  background: #fafafa;
+}
+
+.mov-table tbody tr:hover {
+  background: #fcfcfd;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 96px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.badge.entrada {
+  background: rgba(34, 197, 94, 0.12);
+  color: #15803d;
+}
+
+.badge.saida {
+  background: rgba(239, 68, 68, 0.12);
+  color: #b91c1c;
+}
+
+.positive,
+.negative {
+  font-weight: 800;
+}
+
+.positive {
+  color: #15803d;
+}
+
+.negative {
+  color: #b91c1c;
+}
+
+.mov-state {
+  display: grid;
+  place-items: center;
+  gap: 12px;
+  padding: 42px 20px;
+  text-align: center;
+}
+
+.mov-state.empty {
+  padding: 56px 20px;
+}
+
+.mov-spinner {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 3px solid rgba(17, 24, 39, 0.12);
+  border-top-color: #111827;
+  animation: mov-spin 0.8s linear infinite;
+}
+
+@keyframes mov-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 1080px) {
+  .mov-hero {
+    grid-template-columns: 1fr;
+  }
+
+  .mov-filters {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .mov-summary-pill {
+    grid-column: 1 / -1;
+    width: 100%;
+  }
+}
+
+@media (max-width: 720px) {
+  .mov-page {
+    padding: 18px;
+  }
+
+  .mov-topbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .mov-hero-copy,
+  .mov-panel {
+    padding: 18px;
+  }
+
+  .mov-filters {
+    grid-template-columns: 1fr;
+  }
+
+  .mov-card {
+    padding: 16px;
+  }
+
+  .mov-table th,
+  .mov-table td {
+    padding: 14px 12px;
+  }
+}
+
+html,body,#root{
+  overflow-x:hidden;
+}
+
