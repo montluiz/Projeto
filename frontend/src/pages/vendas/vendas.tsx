@@ -4,8 +4,9 @@ import { Sidebar } from "../../components/sidebar";
 import { IconCart, IconCheck, IconChart, IconClock, IconMoney } from "../../components/ui/icons";
 import "./vendas.css";
 import "../../styles/data-panel.css";
+import API_URL from "../../utils/api";
 
-const API = "http://localhost:3001/api"; // ✅ Adicionado /api
+const API = `${API_URL}/api`; // ✅ Adicionado /api
 
 interface Venda {
   id: number;

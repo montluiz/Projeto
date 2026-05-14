@@ -4,8 +4,9 @@ import { Sidebar } from "../../components/sidebar";
 import { getUser } from "../../utils/auth";
 import "./OrdemServico.css";
 import "./OrdemServicoDetalhes.css";
+import API_URL from "../../utils/api";
 
-const API = "http://localhost:3001/api";
+const API = `${API_URL}/api`;
 
 interface OS {
   id_ordem_servico: number;

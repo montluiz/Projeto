@@ -4,8 +4,9 @@
                     import { IconAlert, IconClock, IconMoney, IconSearch } from "../../components/ui/icons";
                     import "./movimentacoes.css";
 import "../../styles/data-panel.css";
+import API_URL from "../../utils/api";
 
-                    const API = "http://localhost:3001/api";
+                    const API = `${API_URL}/api`;
 
                     interface Movimentacao {
                       id_movimentacao: number;

@@ -5,8 +5,9 @@ import "./Orcamento.css";
 import "../../styles/data-panel.css";
 import ConfirmDialog from "../../components/ui/ConfirmDialog";
 import { formatCurrency, formatDate } from "../../utils/format";
+import API_URL from "../../utils/api";
 
-const API = "http://localhost:3001/api";
+const API = `${API_URL}/api`;
 
 interface Orcamento {
   id: number;

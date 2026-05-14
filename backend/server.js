@@ -7,7 +7,10 @@ const app  = express();
 const PORT = process.env.PORT || 3001;
 
 // ── MIDDLEWARES ───────────────────────────────────────────────────────────────
-app.use(cors(), express.json(), morgan('dev'));
+app.use(cors({
+  origin: process.env.FRONTEND_URL || '*',
+  credentials: true
+}), express.json(), morgan('dev'));
 
 // ── ROTAS ─────────────────────────────────────────────────────────────────────
 app.use('/api',               require('./routes/Auth'));

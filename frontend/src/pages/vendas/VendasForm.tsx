@@ -4,8 +4,9 @@ import { Sidebar } from "../../components/sidebar";
 import { getUser } from "../../utils/auth";
 import "./VendasForm.css";
 import { formatCurrency } from "../../utils/format";
+import API_URL from "../../utils/api";
 
-const API = "http://localhost:3001/api";
+const API = `${API_URL}/api`;
 
 type Item = { id_produto: string; quantidade: string; valor_unitario: string };
 

@@ -2,8 +2,9 @@ import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Sidebar } from "../../components/sidebar";
 import "./FornecedorForm.css";
+import API_URL from "../../utils/api";
 
-const API = "http://localhost:3001/api";
+const API = `${API_URL}/api`;
 
 export default function FornecedorForm() {
   const navigate = useNavigate();

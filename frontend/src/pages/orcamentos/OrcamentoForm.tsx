@@ -2,8 +2,9 @@ import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Sidebar } from "../../components/sidebar";
 import "./OrcamentoForm.css";
+import API_URL from "../../utils/api";
 
-const API = "http://localhost:3001/api";
+const API = `${API_URL}/api`;
 
 export default function OrcamentoForm() {
   const navigate = useNavigate();

@@ -3,8 +3,9 @@ import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { IconAlert, IconBox, IconCart, IconCard, IconMoney, IconTool, IconUsers } from "../../components/ui/icons";
 import "./dashboard.css";
+import API_URL from "../../utils/api";
 
-const API = "http://localhost:3001/api"; // ✅ Adicionado /api
+const API = `${API_URL}/api`; // ✅ Adicionado /api
 
 function fmt(valor: number) {
   return "R$ " + valor.toLocaleString("pt-BR", {

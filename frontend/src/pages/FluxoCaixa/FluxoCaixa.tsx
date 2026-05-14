@@ -6,8 +6,9 @@ import "./FluxoCaixa.css";
 import "../../styles/data-panel.css";
 import ConfirmDialog from "../../components/ui/ConfirmDialog";
 import { formatDate as fmtDate } from "../../utils/format";
+import API_URL from "../../utils/api";
 
-const API = "http://localhost:3001/api";
+const API = `${API_URL}/api`;
 
 interface Caixa {
   id_caixa: number;

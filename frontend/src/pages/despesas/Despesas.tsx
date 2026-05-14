@@ -5,8 +5,9 @@ import { IconClock } from "../../components/ui/icons";
 import "./Despesas.css";
 import "../../styles/data-panel.css";
 import ConfirmDialog from "../../components/ui/ConfirmDialog";
+import API_URL from "../../utils/api";
 
-const API = "http://localhost:3001/api";
+const API = `${API_URL}/api`;
 
 interface Despesa {
   id_despesa: number;

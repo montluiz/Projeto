@@ -4,8 +4,9 @@ import { Sidebar } from "../../components/sidebar";
 import { getUser } from "../../utils/auth";
 import "./FluxoCaixaForm.css";
 import { formatCurrency, formatDateTime } from "../../utils/format";
+import API_URL from "../../utils/api";
 
-const API = "http://localhost:3001/api";
+const API = `${API_URL}/api`;
 
 /**
  * Form para Caixa + Movimentações.

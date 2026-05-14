@@ -1,11 +1,11 @@
 const mysql = require('mysql2');
 
 const connection = mysql.createConnection({
-  host: 'localhost',
-  user: 'root',
-  password: '',
-  database: 'loja_de_ferramentas',
-  port: 3306
+  host:     process.env.DB_HOST,
+  user:     process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+  port:     process.env.DB_PORT || 3306,
 });
 
 connection.connect((err) => {
@@ -13,7 +13,7 @@ connection.connect((err) => {
     console.error('❌ Erro ao conectar ao banco de dados:', err.message);
     return;
   }
-  console.log('✅ Conectado ao banco MySQL - loja_de_ferramentas');
+  console.log('✅ Conectado ao banco MySQL');
 });
 
 module.exports = connection;

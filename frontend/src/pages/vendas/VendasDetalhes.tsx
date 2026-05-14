@@ -3,8 +3,9 @@ import { useParams, useNavigate } from "react-router-dom";
 import { Sidebar } from "../../components/sidebar";
 import { IconCart, IconCheck, IconClock, IconMoney, IconUsers } from "../../components/ui/icons";
 import "./VendasDetalhes.css";
+import API_URL from "../../utils/api";
 
-const API = "http://localhost:3001/api";
+const API = `${API_URL}/api`;
 
 interface Item {
   id_item_venda: number;

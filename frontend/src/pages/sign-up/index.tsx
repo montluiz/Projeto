@@ -4,6 +4,7 @@ import { Input } from "../../components/ui/input";
 import { Button } from "../../components/ui/button";
 import { IconAlert } from "../../components/ui/icons";
 import "../login/login.css";
+import API_URL from "../../utils/api";
 
 function formatarTelefone(valor: string) {
   const nums = valor.replace(/\D/g, "").slice(0, 11);
@@ -45,7 +46,7 @@ export function SignUp() {
     setErro("");
 
     try {
-      const res = await fetch("http://localhost:3001/api/cadastro", {
+      const res = await fetch(`${API_URL}/api/cadastro`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ nomeCompleto, email, usuario, senha, telefone }),

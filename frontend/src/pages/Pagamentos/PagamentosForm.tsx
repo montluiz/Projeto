@@ -3,8 +3,9 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Sidebar } from "../../components/sidebar";
 import { IconClock } from "../../components/ui/icons";
 import "./PagamentosForm.css";
+import API_URL from "../../utils/api";
 
-const API = "http://localhost:3001/api";
+const API = `${API_URL}/api`;
 
 interface Cliente {
   id_cliente: number;

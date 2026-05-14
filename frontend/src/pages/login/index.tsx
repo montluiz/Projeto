@@ -4,6 +4,7 @@ import { Input } from "../../components/ui/input";
 import { Button } from "../../components/ui/button";
 import { IconAlert, IconEye } from "../../components/ui/icons";
 import "./login.css";
+import API_URL from "../../utils/api";
 
 const IconEyeOff = () => (
   <svg
@@ -25,7 +26,7 @@ const IconEyeOff = () => (
 );
 
 async function autenticarComBackend(usuario: string, senha: string) {
-  const response = await fetch("http://localhost:3001/api/login", {
+  const response = await fetch(`${API_URL}/api/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ usuario, senha }),

@@ -2,8 +2,9 @@ import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { IconTrash } from "../../components/ui/icons";
 import "../loja/Loja.css";
+import API_URL from "../../utils/api";
 
-const API = "http://localhost:3001/api";
+const API = `${API_URL}/api`;
 const PEXELS_KEY = "BSrkrC9lc5Dhliaw5oIYXEYfpWyD767FlGl9nYFKhomFmtSIL2Ypz2GT";
 
 type Tipo = 1 | 2 | 3;

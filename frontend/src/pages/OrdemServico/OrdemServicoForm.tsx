@@ -3,8 +3,9 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Sidebar } from "../../components/sidebar";
 import { getUser } from "../../utils/auth";
 import "./OrdemServicoForm.css";
+import API_URL from "../../utils/api";
 
-const API = "http://localhost:3001/api";
+const API = `${API_URL}/api`;
 
 export default function OrdemServicoForm() {
   const navigate = useNavigate();
