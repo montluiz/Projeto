@@ -1,7 +1,7 @@
 const router = require('express').Router();
 const bcrypt = require('bcrypt');
 const jwt    = require('jsonwebtoken');
-const { q }  = require('../helpers/db');
+const { q }  = require('../db');
 const { err400, err500 } = require('../helpers/Response');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'segredo_super_forte';
