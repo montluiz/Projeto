@@ -27,7 +27,7 @@ app.use('/api/orcamentos',    require('./routes/Orcamentos'));
 app.use('/api/caixa',         require('./routes/Caixa'));
 app.use('/api/pagamentos',    require('./routes/Pagamentos'));
 app.use('/api/despesas',      require('./routes/Despesas'));
-app.use('/api/movimentacoes', require('./routes/Movimentacoes'));
+app.use('/api/movimentacoes', require('./routes/movimentacoes'));
 app.use('/api/loja',          require('./routes/Loja'));
 app.use('/api/relatorios',    require('./routes/Relatorios'));
 
