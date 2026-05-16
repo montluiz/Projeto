@@ -10,10 +10,20 @@ const connection = mysql.createConnection({
 
 connection.connect((err) => {
   if (err) {
-    console.error('❌ Erro ao conectar ao banco de dados:', err.message);
+    console.warn('⚠️ Banco não conectado:', err.message);
     return;
   }
   console.log('✅ Conectado ao banco MySQL');
 });
 
+function q(sql, params) {
+  return new Promise((resolve, reject) => {
+    connection.query(sql, params, (err, results) => {
+      if (err) reject(err);
+      else resolve(results);
+    });
+  });
+}
+
 module.exports = connection;
+module.exports.q = q;
