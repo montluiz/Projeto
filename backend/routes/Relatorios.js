@@ -1,7 +1,7 @@
 const router = require('express').Router();
 const auth = require('../middleware/Auth');
 const permissao = require('../middleware/permissao');
-const { q } = require('../helpers/db');
+const { q } = require('../db');
 
 const pAdmin = permissao(1);
 

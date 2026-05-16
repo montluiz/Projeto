@@ -2,7 +2,7 @@ const router   = require('express').Router();
 const bcrypt   = require('bcrypt');
 const auth     = require('../middleware/Auth');
 const permissao = require('../middleware/permissao'); // 👈 adicione
-const { q, buildSet } = require('../helpers/db');
+const { q, buildSet } = require('../db');
 const { err400, err404, err500, ok } = require('../helpers/Response');
 
 // níveis que podem mexer com clientes: admin(1), gerente(2), vendedor(3)

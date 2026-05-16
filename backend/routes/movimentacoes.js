@@ -1,7 +1,7 @@
 const router = require('express').Router();
 const auth   = require('../middleware/Auth');
 const permissao = require('../middleware/permissao');
-const { q }  = require('../helpers/db');
+const { q }  = require('../db');
 const { err500 } = require('../helpers/Response');
 
 const pCaixa = permissao(1, 2, 5);

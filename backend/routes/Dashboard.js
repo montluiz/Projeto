@@ -1,6 +1,6 @@
 const router = require('express').Router();
 const auth   = require('../middleware/Auth');
-const { q }  = require('../helpers/db');
+const { q }  = require('../db');
 const { err500 } = require('../helpers/Response');
 
 // ── DASHBOARD ─────────────────────────────────────────────────────────────────

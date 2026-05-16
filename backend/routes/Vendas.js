@@ -2,7 +2,7 @@ const router    = require('express').Router();
 const db        = require('../db');
 const auth      = require('../middleware/Auth');
 const permissao = require('../middleware/permissao');
-const { q }     = require('../helpers/db');
+const { q }     = require('../db');
 const { err400, err404, err500, ok } = require('../helpers/Response');
 
 const pVendedor = permissao(1, 2, 3);
