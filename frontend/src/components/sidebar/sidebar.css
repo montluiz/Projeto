@@ -1,5 +1,5 @@
 /* =========================================================================
-   SIDEBAR — v2 (escuro, scroll invisível, profissional)
+   SIDEBAR — v5 (à esquerda, fechada por padrão, cobre tudo quando aberta)
    ========================================================================= */
 
 :root {
@@ -8,29 +8,46 @@
   --sb-border: rgba(255, 255, 255, .06);
   --sb-text: #f3f4f6;
   --sb-text-2: #9ca3af;
-  --sb-text-3: #6b7280;
   --sb-primary: #FFD100;
   --sb-active-bg: rgba(255, 209, 0, .12);
   --sb-active-text: #FFD100;
   --sb-hover-bg: rgba(255, 255, 255, .05);
-  --sb-width: 260px;
+  --sb-width: 280px;
 }
 
-.sidebar {
-  width: var(--sb-width);
-  height: 100vh;
+/* ---------- SIDEBAR (fixa à esquerda, ocupa 100% da tela) ---------- */
+aside.sidebar {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: auto !important;
+  bottom: 0 !important;
+  width: var(--sb-width) !important;
+  /* cobre 100% da viewport, sem deixar faixa branca embaixo */
+  height: 100vh !important;
+  height: 100dvh !important;
+  min-height: 100vh !important;
+  min-height: 100dvh !important;
+  margin: 0 !important;
   background:
     radial-gradient(circle at 0% 0%, rgba(255, 209, 0, .06), transparent 36%),
-    var(--sb-bg);
-  border-right: 1px solid var(--sb-border);
+    var(--sb-bg) !important;
+  border-right: 1px solid var(--sb-border) !important;
+  border-left: none !important;
   color: var(--sb-text);
   display: flex;
   flex-direction: column;
-  position: sticky;
-  top: 0;
-  flex-shrink: 0;
-  z-index: 50;
+  z-index: 60;
   font-family: 'Poppins', system-ui, sans-serif;
+
+  /* Fechada por padrão — desliza para fora pela esquerda */
+  transform: translateX(-100%) !important;
+  transition: transform .28s cubic-bezier(.4, 0, .2, 1) !important;
+  box-shadow: 8px 0 32px rgba(0, 0, 0, .35);
+}
+
+aside.sidebar.open {
+  transform: translateX(0) !important;
 }
 
 /* ---------- LOGO ---------- */
@@ -63,30 +80,25 @@
   letter-spacing: -.01em;
 }
 
-/* ---------- NAV (scroll invisível) ---------- */
+/* ---------- NAV ---------- */
 .sidebar-nav {
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
   padding: 14px 12px 18px;
-  /* Scroll invisível mas funcional */
-  scrollbar-width: none;        /* Firefox */
-  -ms-overflow-style: none;     /* IE/Edge antigo */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 .sidebar-nav::-webkit-scrollbar { width: 0; height: 0; display: none; }
-.sidebar-nav::-webkit-scrollbar-track { background: transparent; }
-.sidebar-nav::-webkit-scrollbar-thumb { background: transparent; }
 
 /* ---------- GRUPOS ---------- */
-.sidebar-group {
-  margin-bottom: 14px;
-}
+.sidebar-group { margin-bottom: 14px; }
 .sidebar-group-title {
   font-size: 10.5px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 1.2px;
-  color: var(--sb-text-3);
+  color: var( --sb-text);
   padding: 10px 14px 6px;
   margin: 0;
 }
@@ -100,7 +112,7 @@
   padding: 10px 14px;
   margin: 2px 0;
   border-radius: 10px;
-  color: var(--sb-text-2);
+  color: var(--sb-text);
   font-size: 13.5px;
   font-weight: 500;
   text-decoration: none;
@@ -108,6 +120,7 @@
   cursor: pointer;
   user-select: none;
 }
+/* Indicador na borda esquerda */
 .sidebar-link::before {
   content: "";
   position: absolute;
@@ -124,6 +137,11 @@
   background: var(--sb-hover-bg);
   color: var(--sb-text);
 }
+.sidebar-link:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(255, 209, 0, .25);
+  border-radius: 12px;
+}
 .sidebar-link.active {
   background: var(--sb-active-bg);
   color: var(--sb-active-text);
@@ -138,7 +156,7 @@
   width: 20px;
   height: 20px;
   flex-shrink: 0;
-  color: var(--sb-text-3);
+  color: var(--sb-text);
   transition: color .18s ease;
 }
 .sidebar-link:hover .sidebar-link-icon { color: var(--sb-text); }
@@ -162,6 +180,8 @@
   border-top: 1px solid var(--sb-border);
   flex-shrink: 0;
   background: var(--sb-bg-2);
+  /* respeita safe-area em mobile pra não cortar nem deixar faixa branca */
+  padding-bottom: calc(18px + env(safe-area-inset-bottom, 0px));
 }
 .sidebar-user {
   display: flex;
@@ -194,7 +214,7 @@
 }
 .sidebar-user-role {
   font-size: 11px;
-  color: var(--sb-text-3);
+  color: var(--sb-text);
   margin-top: 1px;
   text-transform: uppercase;
   letter-spacing: .5px;
@@ -211,69 +231,81 @@
   border-radius: 10px;
   background: rgba(255, 255, 255, .04);
   border: 1px solid var(--sb-border);
-  color: var(--sb-text-2);
+  color: var(--sb-text);
   cursor: pointer;
   font-size: 13px;
   font-weight: 600;
   transition: all .18s ease;
 }
-.sidebar-logout::after {
-  content: "Sair";
-}
+.sidebar-logout::after { content: "Sair"; }
 .sidebar-logout:hover {
   background: rgba(220, 38, 38, .12);
   border-color: rgba(220, 38, 38, .25);
   color: #fca5a5;
 }
 
-/* ---------- TOGGLE MOBILE ---------- */
-.sidebar-toggle {
-  display: none;
-  position: fixed;
-  top: 14px;
-  left: 14px;
+/* ---------- BOTÃO SETA (à esquerda, pequena, posicionada no topo) ---------- */
+button.sidebar-toggle {
+  position: fixed !important;
+  top: 80px !important;
+  left: 0 !important;
+  right: auto !important;
   z-index: 70;
-  width: 42px;
-  height: 42px;
-  border-radius: 10px;
-  background: var(--sb-bg);
-  color: var(--sb-text);
+  width: 22px;
+  height: 44px;
+  padding: 0;
+  border-radius: 0 8px 8px 0;
+  background: var(--sb-text);
+  color: var(--sb-bg);
   border: 1px solid var(--sb-border);
+  border-left: none;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, .25);
-  transition: all .18s ease;
+  box-shadow: 3px 3px 12px rgba(0, 0, 0, .25);
+  transition: transform .28s cubic-bezier(.4, 0, .2, 1), background .18s ease;
 }
-.sidebar-toggle:hover { background: var(--sb-bg-2); }
-.sidebar-toggle svg { width: 20px; height: 20px; }
+button.sidebar-toggle:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(255, 209, 0, .35);
+}
+button.sidebar-toggle:hover { background: var(--sb-text); }
+button.sidebar-toggle svg { width: 12px; height: 12px; }
 
+/* Quando a sidebar abre, a seta acompanha colada na borda dela */
+button.sidebar-toggle.open {
+  left: 0 !important;
+  transform: translateX(var(--sb-width));
+  background: var(--sb-bg);
+  color: var(--sb-text);
+}
+
+/* ---------- OVERLAY ---------- */
 .sidebar-overlay {
   display: none;
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, .55);
   backdrop-filter: blur(3px);
-  z-index: 45;
+  z-index: 55;
   opacity: 0;
   transition: opacity .2s ease;
 }
-
-/* ---------- RESPONSIVO ---------- */
-@media (max-width: 1024px) {
-  .sidebar-toggle { display: inline-flex; }
-  .sidebar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    transform: translateX(-100%);
-    transition: transform .25s cubic-bezier(.4, 0, .2, 1);
-    box-shadow: 8px 0 32px rgba(0, 0, 0, .35);
-  }
-  .sidebar.open { transform: translateX(0); }
-  .sidebar-overlay.open { display: block; opacity: 1; }
+.sidebar-overlay.open {
+  display: block;
+  opacity: 1;
 }
 
+/* ---------- RESPONSIVO ---------- */
 @media (max-width: 480px) {
-  .sidebar { width: 86vw; max-width: 300px; }
+  aside.sidebar { --sb-width: 86vw; width: var(--sb-width) !important; max-width: 320px !important; }
+  button.sidebar-toggle.open { left: 39.1px !important; transform: translateX(var(--sb-width)); }
+  .sidebar-link { align-items: flex-start; }
+  .sidebar-link-label {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+    line-height: 1.2;
+  }
 }

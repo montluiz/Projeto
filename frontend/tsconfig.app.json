@@ -24,5 +24,6 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true
   },
-  "include": ["src", "main.tsx", "teste-conexao/clientes.routes.js"]
+  "include": ["src", "main.tsx", "teste-conexao/clientes.routes.js"],
+  "exclude": ["src/routes"]
 }

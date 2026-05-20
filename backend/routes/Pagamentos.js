@@ -132,6 +132,27 @@ router.post('/', auth, pCaixa, async (req, res) => {
   } catch (e) { err500(res, e); }
 });
 
+
+// ── EDITAR PAGAMENTO ─────────────────────────────────────────────────────────
+router.put('/:id', auth, pCaixa, async (req, res) => {
+  try {
+    const [pag] = await q(`SELECT * FROM pagamento WHERE id_pagamento=?`, [req.params.id]);
+    if (!pag) return err404(res, 'Pagamento não encontrado');
+    if (pag.status === 'pago') return err400(res, 'Pagamento já confirmado não pode ser editado');
+
+    const { valor, forma_pagamento, id_cliente, id_venda, status, descricao, data_pagamento, data_vencimento } = req.body;
+    const { buildSet } = require('../helpers/Db');
+    const { cols, vals } = buildSet(req.body, [
+      'valor', 'forma_pagamento', 'id_cliente', 'id_venda',
+      'status', 'descricao', 'data_pagamento', 'data_vencimento'
+    ]);
+    if (!cols.length) return err400(res, 'Nada para atualizar');
+
+    await q(`UPDATE pagamento SET ${cols.join(', ')} WHERE id_pagamento=?`, [...vals, req.params.id]);
+    ok(res, { message: 'Pagamento atualizado com sucesso' });
+  } catch (e) { err500(res, e); }
+});
+
 // ── BAIXAR PAGAMENTO (receber) ────────────────────────────────────────────────
 router.put('/:id/baixar', auth, pCaixa, async (req, res) => {
   const { forma_pagamento, observacoes } = req.body;

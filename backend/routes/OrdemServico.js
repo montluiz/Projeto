@@ -50,37 +50,26 @@ router.get('/', auth, pTecnico, async (req, res) => {
 // ── BUSCAR POR ID ─────────────────────────────────────────────────────────────
 router.get('/:id', auth, pTecnico, async (req, res) => {
   try {
-    const [os, diagnosticos, reparos, garantia] = await Promise.all([
-      q(`SELECT os.*, c.nome AS nome_cliente, c.telefone AS telefone_cliente,
+    const [os] = await q(`SELECT os.*, c.nome AS nome_cliente, c.telefone AS telefone_cliente,
                 f.nome AS nome_tecnico
          FROM ordem_servico os
          LEFT JOIN cliente     c ON c.id_cliente       = os.id_cliente
          LEFT JOIN funcionario f ON f.id_funcionario   = os.id_tecnico
-         WHERE os.id_ordem_servico = ?`, [req.params.id]),
+         WHERE os.id_ordem_servico = ?`, [req.params.id]);
 
-      q(`SELECT d.*, f.nome AS nome_tecnico
-         FROM os_diagnostico d
-         LEFT JOIN funcionario f ON f.id_funcionario = d.id_tecnico
-         WHERE d.id_ordem_servico = ?
-         ORDER BY d.created_at ASC`, [req.params.id]),
+    if (!os) return err404(res, 'OS não encontrada');
 
-      q(`SELECT r.*, f.nome AS nome_tecnico
-         FROM os_reparo r
-         LEFT JOIN funcionario f ON f.id_funcionario = r.id_tecnico
-         WHERE r.id_ordem_servico = ?
-         ORDER BY r.created_at ASC`, [req.params.id]),
+    if (req.user.nivel === 4 && os.id_tecnico !== null && os.id_tecnico !== req.user.id) {
+      return res.status(403).json({ error: 'Acesso negado' });
+    }
 
-      q(`SELECT * FROM os_garantia WHERE id_ordem_servico = ?`, [req.params.id]),
-    ]);
+    // Busca tabelas auxiliares com tolerância a erros (tabelas podem não existir ainda)
+    let diagnosticos = [], reparos = [], garantia = null;
+    try { diagnosticos = await q(`SELECT d.*, f.nome AS nome_tecnico FROM os_diagnostico d LEFT JOIN funcionario f ON f.id_funcionario = d.id_tecnico WHERE d.id_ordem_servico = ? ORDER BY d.created_at ASC`, [req.params.id]); } catch {}
+    try { reparos = await q(`SELECT r.*, f.nome AS nome_tecnico FROM os_reparo r LEFT JOIN funcionario f ON f.id_funcionario = r.id_tecnico WHERE r.id_ordem_servico = ? ORDER BY r.created_at ASC`, [req.params.id]); } catch {}
+    try { const g = await q(`SELECT * FROM os_garantia WHERE id_ordem_servico = ?`, [req.params.id]); garantia = g[0] || null; } catch {}
 
-    if (!os.length) return err404(res, 'OS não encontrada');
-
-    // Técnico só é barrado se a OS tem OUTRO técnico vinculado
-if (req.user.nivel === 4 && os[0].id_tecnico !== null && os[0].id_tecnico !== req.user.id) {
-  return res.status(403).json({ error: 'Acesso negado' });
-}
-
-    res.json({ ...os[0], diagnosticos, reparos, garantia: garantia[0] || null });
+    res.json({ ...os, diagnosticos, reparos, garantia });
   } catch (e) { err500(res, e); }
 });
 
@@ -125,6 +114,12 @@ router.put('/:id', auth, pGerente, async (req, res) => {
   try {
     const exists = await q(`SELECT id_ordem_servico, id_tecnico FROM ordem_servico WHERE id_ordem_servico=?`, [id]);
     if (!exists.length) return err404(res, 'OS não encontrada');
+
+    if (Object.prototype.hasOwnProperty.call(req.body, 'id_orcamento')) {
+      const raw = req.body.id_orcamento;
+      const num = raw === '' || raw === null || raw === undefined ? null : Number(raw);
+      req.body.id_orcamento = num && Number.isFinite(num) ? num : null;
+    }
 
     const tecnicoAnterior = exists[0].id_tecnico;
     const { cols, vals } = buildSet(req.body, [

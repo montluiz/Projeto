@@ -91,6 +91,107 @@ textarea {
 }
 
 /* =========================================================================
+   TOPBAR GLOBAL (DESKTOP + MOBILE)
+   ========================================================================= */
+
+.p-topbar,
+.topbar {
+  align-items: center;
+}
+
+/* Alinhamento padrão de header em todas as telas */
+.p-topbar,
+.topbar,
+.dashboard-topbar {
+  justify-content: space-between !important;
+  align-items: center !important;
+}
+
+.p-topbar-title,
+.topbar-title {
+  margin-right: auto !important;
+  text-align: left !important;
+  padding-left: 0 !important;
+}
+
+.p-topbar-actions,
+.topbar-actions {
+  margin-left: auto !important;
+}
+
+.p-topbar-actions .btn-primary,
+.topbar-actions .btn-primary,
+.p-topbar-actions button,
+.topbar-actions button {
+  height: 38px !important;
+  padding: 0 14px !important;
+  font-size: 13px !important;
+  border-radius: 10px !important;
+  white-space: nowrap !important;
+}
+
+.p-topbar-title,
+.topbar-title {
+  display: flex;
+  align-items: center;
+  margin: 0;
+}
+
+@media (max-width: 720px) {
+  .p-topbar,
+  .topbar {
+    justify-content: flex-start !important;
+    align-items: center !important;
+    flex-wrap: nowrap !important;
+    gap: 8px;
+    padding-left: 8px !important;
+  }
+
+  .p-topbar-title,
+  .topbar-title {
+    width: auto;
+    font-size: 14px;
+  }
+
+  .p-topbar-actions,
+  .topbar-actions {
+    width: auto !important;
+    justify-content: flex-start !important;
+    padding-left: 8px;
+  }
+
+  .p-topbar-actions .btn-primary,
+  .p-topbar-actions button,
+  .p-topbar-actions .button {
+    height: 28px !important;
+    padding: 0 10px !important;
+    font-size: 11px !important;
+  }
+
+  .p-topbar,
+  .topbar,
+  .dashboard-topbar {
+    padding: 0 14px 0 64px !important;
+    gap: 10px !important;
+  }
+
+  .p-topbar-title,
+  .topbar-title {
+    font-size: 15px !important;
+    justify-content: flex-start !important;
+  }
+
+  .p-topbar-actions .btn-primary,
+  .topbar-actions .btn-primary,
+  .p-topbar-actions button,
+  .topbar-actions button {
+    height: 32px !important;
+    padding: 0 10px !important;
+    font-size: 11px !important;
+  }
+}
+
+/* =========================================================================
    SCROLLBAR
    ========================================================================= */
 
@@ -242,7 +343,7 @@ textarea {
 .dashboard-topbar {
   height: 68px;
 
-  padding: 0 28px;
+  padding: 0 28px 0 10px;
 
   background: rgba(255,255,255,.85);
 
@@ -290,6 +391,31 @@ textarea {
   overflow-x: hidden;
 
   padding: 28px 32px 36px;
+}
+
+/* =========================================================================
+   FORM UI
+   ========================================================================= */
+
+.form-card-title {
+  margin: 0 0 16px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ma-text);
+  letter-spacing: -0.2px;
+}
+
+.form-card-subtitle {
+  margin: -8px 0 16px;
+  font-size: 12px;
+  color: var(--ma-muted);
+}
+
+.form-section-title {
+  margin: 24px 0 8px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ma-text);
 }
 
 /* =========================================================================
@@ -429,7 +555,7 @@ tbody td {
   .dashboard-topbar {
     height: 60px;
 
-    padding: 0 14px 0 72px;
+    padding: 0 14px 0 10px;
   }
 
   .stats-row,
@@ -457,7 +583,7 @@ tbody td {
   .p-topbar,
   .u-topbar,
   .dashboard-topbar {
-    padding: 12px 14px 12px 64px;
+    padding: 12px 14px 12px 10px;
   }
 
   .sidebar {
@@ -490,6 +616,34 @@ tbody td {
 
   .btn {
     width: 100%;
+  }
+
+  .form-card,
+  .df-card {
+    padding: 16px;
+    border-radius: 18px;
+  }
+
+  .form-grid,
+  .df-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .form-group.full-width,
+  .df-full {
+    grid-column: 1 / -1;
+  }
+
+  .form-actions,
+  .df-footer {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+
+  .form-actions .btn,
+  .df-footer .btn {
+    width: 100%;
+    justify-content: center;
   }
 
 }

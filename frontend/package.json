@@ -3,10 +3,11 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --host 0.0.0.0",
     "build": "vite build",
     "preview": "vite preview",
-    "serve": "npx serve -s dist -l $PORT"
+    "serve": "npx serve -s dist -l $PORT",
+    "start": "npx serve -s dist -l $PORT"
   },
   "dependencies": {
     "bootstrap": "^5.3.8",

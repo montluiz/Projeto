@@ -115,12 +115,20 @@ router.get('/:id', auth, pCaixa, async (req, res) => {
 // ── ABRIR CAIXA ───────────────────────────────────────────────────────────────
 router.post('/', auth, pCaixa, async (req, res) => {
   const { valor_abertura, id_funcionario } = req.body;
-  if (valor_abertura === undefined || !id_funcionario)
-    return err400(res, 'Campos obrigatórios: valor_abertura, id_funcionario');
+  if (valor_abertura === undefined)
+    return err400(res, 'Campos obrigatórios: valor_abertura');
   if (Number(valor_abertura) < 0)
     return err400(res, 'Valor de abertura não pode ser negativo');
 
   try {
+    // Resolve id_funcionario: use provided value or look up by authenticated user id
+    let funcId = id_funcionario ? Number(id_funcionario) : null;
+    if (!funcId) {
+      const [func] = await q(`SELECT id_funcionario FROM funcionario WHERE id_usuario=? LIMIT 1`, [req.user.id]);
+      if (func) funcId = func.id_funcionario;
+    }
+    if (!funcId) return err400(res, 'Funcionário não encontrado para o usuário atual');
+
     const [aberto] = await q(
       `SELECT id_caixa FROM caixa WHERE valor_fechamento IS NULL ORDER BY data DESC LIMIT 1`
     );
@@ -129,7 +137,7 @@ router.post('/', auth, pCaixa, async (req, res) => {
     const r = await q(
       `INSERT INTO caixa (data, valor_abertura, valor_fechamento, id_funcionario, status)
        VALUES (NOW(), ?, NULL, ?, 1)`,
-      [valor_abertura, id_funcionario]
+      [valor_abertura, funcId]
     );
     res.status(201).json({ success: true, message: 'Caixa aberto com sucesso', id_caixa: r.insertId });
   } catch (e) { err500(res, e); }

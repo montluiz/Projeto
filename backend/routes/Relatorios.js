@@ -59,15 +59,15 @@ router.get('/:tipo', auth, pAdmin, async (req, res) => {
         const rows = await q(
           `SELECT os.id_ordem_servico AS os,
                   c.nome AS cliente,
-                  COALESCE(f.nome, 'Sem técnico') AS tecnico,
+                  f.nome AS tecnico,
+                  os.descricao_problema AS descricao,
                   CASE
-                    WHEN os.status_execucao = 0 THEN 'Aguardando'
-                    WHEN os.status_execucao = 1 THEN 'Diagnóstico'
-                    WHEN os.status_execucao = 2 THEN 'Reparo'
-                    WHEN os.status_execucao = 3 THEN 'Concluída'
-                    WHEN os.status_execucao = 4 THEN 'Cancelada'
+                    WHEN os.status = 0 THEN 'Aberta'
+                    WHEN os.status = 1 THEN 'Em andamento'
+                    WHEN os.status = 2 THEN 'Concluída'
                     ELSE 'Outro'
-                  END AS status
+                  END AS status,
+                  DATE_FORMAT(os.data_abertura, '%d/%m/%Y') AS data_abertura
            FROM ordem_servico os
            LEFT JOIN cliente c ON c.id_cliente = os.id_cliente
            LEFT JOIN funcionario f ON f.id_funcionario = os.id_tecnico
@@ -76,30 +76,28 @@ router.get('/:tipo', auth, pAdmin, async (req, res) => {
         );
         return res.json({
           summary: `${rows.length} ordens de serviço carregadas do sistema.`,
-          headers: ['OS', 'Cliente', 'Técnico', 'Status'],
-          rows: rows.map((row) => [String(row.os), row.cliente, row.tecnico, row.status]),
+          headers: ['OS', 'Cliente', 'Técnico', 'Descrição', 'Status', 'Data Abertura'],
+          rows: rows.map((row) => [String(row.os), row.cliente || '-', row.tecnico || 'Sem técnico', row.descricao, row.status, row.data_abertura]),
         });
       }
 
       case 'garantias-processadas': {
         const rows = await q(
-          `SELECT og.id_garantia AS garantia,
-                  os.id_ordem_servico AS os,
+          `SELECT r.id_reparo AS id_garantia,
+                  r.id_ordem_servico AS os,
                   COALESCE(c.nome, 'Sem cliente') AS cliente,
-                  CASE
-                    WHEN og.data_fim >= CURDATE() THEN 'Ativa'
-                    ELSE 'Expirada'
-                  END AS status
-           FROM os_garantia og
-           LEFT JOIN ordem_servico os ON os.id_ordem_servico = og.id_ordem_servico
+                  DATE_FORMAT(r.data, '%d/%m/%Y') AS data_reparo,
+                  CONCAT('R$ ', FORMAT(r.custo, 2, 'pt_BR')) AS custo_reparo
+           FROM reparo r
+           LEFT JOIN ordem_servico os ON os.id_ordem_servico = r.id_ordem_servico
            LEFT JOIN cliente c ON c.id_cliente = os.id_cliente
-           ORDER BY og.id_garantia DESC
+           ORDER BY r.id_reparo DESC
            LIMIT 20`
         );
         return res.json({
-          summary: `${rows.length} garantias encontradas no banco de dados.`,
-          headers: ['Garantia', 'OS', 'Cliente', 'Status'],
-          rows: rows.map((row) => [String(row.garantia), String(row.os), row.cliente, row.status]),
+          summary: `${rows.length} reparo(s) com garantia registrado(s) no sistema.`,
+          headers: ['ID', 'OS', 'Cliente', 'Data do Reparo', 'Custo'],
+          rows: rows.map((row) => [String(row.id_garantia), String(row.os), row.cliente, row.data_reparo, row.custo_reparo]),
         });
       }
 
@@ -182,39 +180,60 @@ router.get('/:tipo', auth, pAdmin, async (req, res) => {
       case 'performance-tecnica': {
         const rows = await q(
           `SELECT f.nome AS tecnico,
-                  COUNT(os.id_ordem_servico) AS ordens_concluidas,
-                  ROUND(AVG(TIMESTAMPDIFF(MINUTE, os.data_recebimento, os.data_conclusao)), 0) AS tempo_medio_min,
-                  CONCAT(ROUND(100 * SUM(os.status_execucao = 3) / COUNT(os.id_ordem_servico), 0), '%') AS taxa_conclusao
-           FROM ordem_servico os
-           LEFT JOIN funcionario f ON f.id_funcionario = os.id_tecnico
-           WHERE os.status_execucao = 3
+                  COUNT(os.id_ordem_servico) AS total_ordens,
+                  SUM(CASE WHEN os.status = 2 THEN 1 ELSE 0 END) AS ordens_concluidas,
+                  SUM(CASE WHEN os.status = 1 THEN 1 ELSE 0 END) AS ordens_andamento,
+                  CONCAT(ROUND(100 * SUM(CASE WHEN os.status = 2 THEN 1 ELSE 0 END) / COUNT(os.id_ordem_servico), 0), '%') AS taxa_conclusao
+           FROM funcionario f
+           LEFT JOIN ordem_servico os ON os.id_tecnico = f.id_funcionario
+           WHERE f.ativo = 1
            GROUP BY f.id_funcionario
-           ORDER BY taxa_conclusao DESC
+           HAVING total_ordens > 0
+           ORDER BY ordens_concluidas DESC
            LIMIT 20`
         );
         return res.json({
-          summary: `${rows.length} técnico(s) com resultados de ordens de serviço concluídas.`,
-          headers: ['Técnico', 'OS Concluídas', 'Tempo Médio (min)', 'Taxa de Conclusão'],
-          rows: rows.map((row) => [row.tecnico || 'Sem técnico', String(row.ordens_concluidas), String(row.tempo_medio_min || 0), row.taxa_conclusao]),
+          summary: `${rows.length} técnico(s) com ordens de serviço registradas.`,
+          headers: ['Técnico', 'Total OS', 'Concluídas', 'Em Andamento', 'Taxa de Conclusão'],
+          rows: rows.map((row) => [row.tecnico, String(row.total_ordens), String(row.ordens_concluidas), String(row.ordens_andamento), row.taxa_conclusao]),
         });
       }
 
       case 'fluxo-caixa-diario': {
         const rows = await q(
-          `SELECT DATE_FORMAT(m.data, '%d/%m/%Y') AS data,
-                  SUM(CASE WHEN m.tipo = 'entrada' THEN m.valor ELSE 0 END) AS entradas,
-                  SUM(CASE WHEN m.tipo = 'saida' THEN m.valor ELSE 0 END) AS saidas,
-                  SUM(CASE WHEN m.tipo = 'entrada' THEN m.valor ELSE 0 END) - SUM(CASE WHEN m.tipo = 'saida' THEN m.valor ELSE 0 END) AS saldo
-           FROM movimentacao_caixa m
-           WHERE m.data BETWEEN DATE_SUB(CURDATE(), INTERVAL 7 DAY) AND CURDATE()
-           GROUP BY DATE(m.data)
-           ORDER BY m.data DESC
-           LIMIT 14`
+          `SELECT dia,
+                  SUM(entradas) AS entradas,
+                  SUM(saidas) AS saidas,
+                  SUM(entradas) - SUM(saidas) AS saldo
+           FROM (
+             SELECT DATE_FORMAT(data_pagamento, '%d/%m/%Y') AS dia,
+                    COALESCE(SUM(valor), 0) AS entradas,
+                    0 AS saidas
+             FROM pagamento
+             WHERE status = 'pago'
+               AND DATE(data_pagamento) BETWEEN DATE_SUB(CURDATE(), INTERVAL 30 DAY) AND CURDATE()
+             GROUP BY DATE(data_pagamento)
+             UNION ALL
+             SELECT DATE_FORMAT(data, '%d/%m/%Y') AS dia,
+                    0 AS entradas,
+                    COALESCE(SUM(custo), 0) AS saidas
+             FROM reparo
+             WHERE DATE(data) BETWEEN DATE_SUB(CURDATE(), INTERVAL 30 DAY) AND CURDATE()
+             GROUP BY DATE(data)
+           ) AS mov
+           GROUP BY dia
+           ORDER BY STR_TO_DATE(dia, '%d/%m/%Y') DESC
+           LIMIT 30`
         );
         return res.json({
-          summary: `Fluxo de caixa diário calculado com base nas movimentações de caixa registradas.`,
+          summary: `Fluxo de caixa dos últimos 30 dias com base em pagamentos recebidos e custos de reparo.`,
           headers: ['Data', 'Entradas', 'Saídas', 'Saldo'],
-          rows: rows.map((row) => [row.data, `R$ ${Number(row.entradas).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, `R$ ${Number(row.saidas).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, `R$ ${Number(row.saldo).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`]),
+          rows: rows.map((row) => [
+            row.dia,
+            `R$ ${Number(row.entradas).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+            `R$ ${Number(row.saidas).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+            `R$ ${Number(row.saldo).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+          ]),
         });
       }
 

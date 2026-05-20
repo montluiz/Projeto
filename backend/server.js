@@ -8,7 +8,7 @@ const PORT = process.env.PORT || 3001;
 
 // ── MIDDLEWARES ───────────────────────────────────────────────────────────────
 app.use(cors({
-  origin: process.env.FRONTEND_URL || '*',
+  origin: true,
   credentials: true
 }), express.json(), morgan('dev'));
 
@@ -38,4 +38,4 @@ app.use((err, req, res, next) => {
 });
 
 // ── START ─────────────────────────────────────────────────────────────────────
-app.listen(PORT, () => console.log(`Servidor rodando na porta ${PORT}`));
+app.listen(PORT, '0.0.0.0', () => { console.log(`Servidor rodando na porta ${PORT}`); });

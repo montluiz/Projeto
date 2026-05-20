@@ -24,36 +24,37 @@ import { createRoot } from "react-dom/client";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import PrivateRoute from "./components/PrivateRoute";
 
-import { Login }        from "./pages/login";
-import { Home }         from "./pages/home/home";
-import { SignUp }       from "./pages/sign-up";
-import { Dashboard }    from "./pages/dashboard";
-import Produtos         from "./pages/produtos/Produtos";
-import ProdutoForm      from "./pages/produtos/ProdutoForm";
-import Clientes         from "./pages/clientes/Clientes";
-import ClienteForm      from "./pages/clientes/ClienteForm";
-import Loja             from "./pages/loja/Loja";
-import Fornecedores     from "./pages/fornecedores/fornecedores";
-import FornecedorForm   from "./pages/fornecedores/FornecedorForm";
-import Funcionarios     from "./pages/funcionarios/funcionarios";
-import FuncionarioForm  from "./pages/funcionarios/FuncionarioForm";
-import Vendas           from "./pages/vendas/vendas";
-import VendasForm       from "./pages/vendas/VendasForm";
-import VendasDetalhes   from "./pages/vendas/VendasDetalhes";
-import Ordem            from "./pages/OrdemServico/OrdemServico";
-import OrdemForm        from "./pages/OrdemServico/OrdemServicoForm";
-import OrdemServicoDetalhes from "./pages/OrdemServico/OrdemServicoDetalhes";
-import Orcamento        from "./pages/orcamentos/Orcamento";
-import OrcamentoForm    from "./pages/orcamentos/OrcamentoForm";
-import Caixa            from "./pages/FluxoCaixa/FluxoCaixa";
-import CaixaForm        from "./pages/FluxoCaixa/FluxoCaixaForm";
-import Pagamentos       from "./pages/Pagamentos/Pagamentos";
-import PagamentosForm   from "./pages/Pagamentos/PagamentosForm";
-import Movimentacoes    from "./pages/movimentacoes/movimentacoes";
-import Despesas         from "./pages/despesas/Despesas";
-import DespesasForm     from "./pages/despesas/DespesasForm";
-import Usuarios         from "./pages/usuarios/Usuarios";
-import Relatorios       from "./pages/relatorios/Relatorios";
+import { Login }        from "./pages/pages/login";
+import { Home }         from "./pages/pages/home/home";
+import { SignUp }       from "./pages/pages/sign-up";
+import { Dashboard }    from "./pages/pages/dashboard";
+import Produtos         from "./pages/pages/produtos/Produtos";
+import ProdutoForm      from "./pages/pages/produtos/ProdutoForm";
+import Clientes         from "./pages/pages/clientes/Clientes";
+import ClienteForm      from "./pages/pages/clientes/ClienteForm";
+import Loja             from "./pages/pages/loja/Loja";
+import Fornecedores     from "./pages/pages/fornecedores/fornecedores";
+import FornecedorForm   from "./pages/pages/fornecedores/FornecedorForm";
+import Funcionarios     from "./pages/pages/funcionarios/funcionarios";
+import FuncionarioForm  from "./pages/pages/funcionarios/FuncionarioForm";
+import Vendas           from "./pages/pages/vendas/vendas";
+import VendasForm       from "./pages/pages/vendas/VendasForm";
+import VendasDetalhes   from "./pages/pages/vendas/VendasDetalhes";
+import Ordem            from "./pages/pages/OrdemServico/OrdemServico";
+import OrdemForm        from "./pages/pages/OrdemServico/OrdemServicoForm";
+import OrdemServicoDetalhes from "./pages/pages/OrdemServico/OrdemServicoDetalhes";
+import Orcamento        from "./pages/pages/orcamentos/Orcamento";
+import OrcamentoForm    from "./pages/pages/orcamentos/OrcamentoForm";
+import Caixa            from "./pages/pages/FluxoCaixa/FluxoCaixa";
+import CaixaForm        from "./pages/pages/FluxoCaixa/FluxoCaixaForm";
+import Pagamentos       from "./pages/pages/Pagamentos/Pagamentos";
+import PagamentosForm   from "./pages/pages/Pagamentos/PagamentosForm";
+import Movimentacoes    from "./pages/pages/movimentacoes/movimentacoes";
+import Despesas         from "./pages/pages/despesas/Despesas";
+import DespesasForm     from "./pages/pages/despesas/DespesasForm";
+import Usuarios         from "./pages/pages/usuarios/Usuarios";
+import Relatorios       from "./pages/pages/relatorios/Relatorios";
+import Detalhes         from "./pages/pages/detalhes/Detalhes";
 
 import "./index.css";
 
@@ -137,6 +138,9 @@ createRoot(root!).render(
 
       {/* ── MOVIMENTAÇÕES — gerente+ ── */}
       <Route path="/movimentacoes"       element={<PrivateRoute element={<Movimentacoes />} niveis={CAIXA} />} />
+
+      {/* ── DETALHES — visão rápida ── */}
+      <Route path="/detalhes"            element={<PrivateRoute element={<Detalhes />} />} />
 
       {/* ── USUÁRIOS — só admin ── */}
       <Route path="/usuarios" element={<PrivateRoute element={<Usuarios />} niveis={ADMIN} />} />

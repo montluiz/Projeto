@@ -6,6 +6,7 @@ const connection = mysql.createConnection({
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
   port:     process.env.DB_PORT || 3306,
+  charset:  'utf8mb4',
 });
 
 connection.connect((err) => {
@@ -25,5 +26,17 @@ function q(sql, params) {
   });
 }
 
+function buildSet(body, fields) {
+  const cols = [], vals = [];
+  fields.forEach((f) => {
+    if (body[f] !== undefined) {
+      cols.push(`${f} = ?`);
+      vals.push(body[f]);
+    }
+  });
+  return { cols, vals };
+}
+
 module.exports = connection;
 module.exports.q = q;
+module.exports.buildSet = buildSet;

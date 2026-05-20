@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import "./sidebar.css";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { getUser } from "../../utils/auth";
@@ -22,6 +22,10 @@ const IconDespesa      = () => <svg width="16" height="16" viewBox="0 0 24 24" f
 const IconRelatorios  = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg>;
 const IconLogout       = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>;
 
+// Setas para abrir/fechar (vindo da direita)
+const IconChevronLeft  = () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>;
+const IconChevronRight = () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"/></svg>;
+
 // ── MAPEAMENTO DE NÍVEL → NOME ────────────────────────────────────────────────
 const NIVEL_NOME: Record<number, string> = {
   1: "Administrador",
@@ -33,7 +37,6 @@ const NIVEL_NOME: Record<number, string> = {
 };
 
 // ── DEFINIÇÃO DO MENU COM NÍVEIS PERMITIDOS ───────────────────────────────────
-// niveis: quais níveis enxergam este item. Ausente = todos.
 const navGroups = [
   {
     title: null,
@@ -83,16 +86,19 @@ const navGroups = [
 ];
 
 export function Sidebar() {
+  // Fechado por padrão em qualquer tamanho de tela
   const [open, setOpen] = useState(false);
   const [confirmLogout, setConfirmLogout] = useState(false);
+  const [navScroll, setNavScroll] = useState(0);
   const location = useLocation();
+  const locationState = location.state as { from?: string } | null;
   const navigate = useNavigate();
+  const navRef = useRef<HTMLElement | null>(null);
+  const activeLinkRef = useRef<HTMLAnchorElement | null>(null);
 
-  // Lê o nível direto do token JWT (já decodificado pelo getUser)
   const user = getUser();
   const nivel = user?.nivel ?? 0;
 
-  // Lê nome do sessionStorage igual antes
   const usuarioRaw = sessionStorage.getItem("usuario");
   let usuarioSession: any = null;
   try { usuarioSession = usuarioRaw ? JSON.parse(usuarioRaw) : null; } catch { }
@@ -109,14 +115,36 @@ export function Sidebar() {
   }
 
   const close = () => setOpen(false);
+  const toggle = () => setOpen(o => !o);
+
+  const effectivePath =
+    location.pathname === "/detalhes" && locationState?.from
+      ? locationState.from
+      : location.pathname;
+
+  const isActivePath = (to: string, pathname: string) =>
+    pathname === to || pathname.startsWith(`${to}/`);
+
+  useEffect(() => {
+    if (!open) return;
+    const nav = navRef.current;
+    if (nav) {
+      nav.scrollTop = navScroll;
+    }
+    if (activeLinkRef.current) {
+      activeLinkRef.current.scrollIntoView({ block: "center" });
+    }
+  }, [open]);
 
   return (
     <>
-      <button className="sidebar-toggle" onClick={() => setOpen(o => !o)} aria-label="Menu">
-        {open
-          ? <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-          : <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-        }
+      {/* Botão seta — sempre visível, fixo à direita */}
+      <button
+        className={`sidebar-toggle ${open ? "open" : ""}`}
+        onClick={toggle}
+        aria-label={open ? "Fechar menu" : "Abrir menu"}
+      >
+        {open ? <IconChevronLeft /> : <IconChevronRight />}
       </button>
 
       <div className={`sidebar-overlay ${open ? "open" : ""}`} onClick={close} />
@@ -129,14 +157,16 @@ export function Sidebar() {
         </div>
 
         {/* Nav */}
-        <nav className="sidebar-nav">
+        <nav
+          className="sidebar-nav"
+          ref={navRef}
+          onScroll={(e) => setNavScroll((e.currentTarget as HTMLElement).scrollTop)}
+        >
           {navGroups.map((group, gi) => {
-            // Filtra itens que o nível do usuário pode ver
             const itensFiltrados = group.items.filter(item =>
               !item.niveis || item.niveis.includes(nivel)
             );
 
-            // Se o grupo não tem nenhum item visível, não renderiza o grupo
             if (!itensFiltrados.length) return null;
 
             return (
@@ -145,12 +175,13 @@ export function Sidebar() {
                   <p className="sidebar-group-title">{group.title}</p>
                 )}
                 {itensFiltrados.map((item) => {
-                  const active = location.pathname === item.to;
+                  const active = isActivePath(item.to, effectivePath);
                   return (
                     <Link
                       key={item.to}
                       to={item.to}
                       onClick={close}
+                      ref={active ? activeLinkRef : undefined}
                       className={`sidebar-link ${active ? "active" : ""}`}
                     >
                       <span className="sidebar-link-icon">{item.icon}</span>
