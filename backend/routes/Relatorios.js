@@ -3,7 +3,7 @@ const auth = require('../middleware/Auth');
 const permissao = require('../middleware/permissao');
 const { q } = require('../db');
 
-const pAdmin = permissao(1);
+const pAdmin = permissao(1, 2);
 
 function formatDate(date) {
   return date.toISOString().slice(0, 10);
@@ -215,35 +215,43 @@ router.get('/:tipo', auth, pAdmin, async (req, res) => {
 
       case 'fluxo-caixa-diario': {
         const rows = await q(
-          `SELECT dia,
+          `SELECT DATE_FORMAT(dia_ref, '%d/%m/%Y') AS dia,
                   COALESCE(SUM(entradas), 0) AS entradas,
                   COALESCE(SUM(saidas),   0) AS saidas,
                   COALESCE(SUM(entradas), 0) - COALESCE(SUM(saidas), 0) AS saldo
            FROM (
-             SELECT DATE_FORMAT(data_pagamento, '%d/%m/%Y') AS dia,
+             SELECT DATE(data_pagamento) AS dia_ref,
                     COALESCE(SUM(valor), 0) AS entradas,
                     0 AS saidas
              FROM pagamento
              WHERE status = 'pago'
-               AND DATE(data_pagamento) BETWEEN DATE_SUB(CURDATE(), INTERVAL 30 DAY) AND CURDATE()
+               AND DATE(data_pagamento) >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)
              GROUP BY DATE(data_pagamento)
              UNION ALL
-             SELECT DATE_FORMAT(data, '%d/%m/%Y') AS dia,
+             SELECT DATE(data) AS dia_ref,
                     0 AS entradas,
                     COALESCE(SUM(custo), 0) AS saidas
              FROM reparo
-             WHERE DATE(data) BETWEEN DATE_SUB(CURDATE(), INTERVAL 30 DAY) AND CURDATE()
+             WHERE DATE(data) >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)
              GROUP BY DATE(data)
            ) AS mov
-           GROUP BY dia
-           ORDER BY STR_TO_DATE(dia, '%d/%m/%Y') DESC
+           GROUP BY dia_ref
+           ORDER BY dia_ref DESC
            LIMIT 30`
         );
 
         const safeRows = Array.isArray(rows) ? rows : [];
 
+        if (safeRows.length === 0) {
+          return res.json({
+            summary: 'Nenhuma movimentação encontrada nos últimos 30 dias.',
+            headers: ['Data', 'Entradas', 'Saídas', 'Saldo'],
+            rows: [],
+          });
+        }
+
         return res.json({
-          summary: `Fluxo de caixa dos últimos 30 dias com base em pagamentos recebidos e custos de reparo.`,
+          summary: `Fluxo de caixa dos últimos 30 dias (${safeRows.length} dia(s) com movimento).`,
           headers: ['Data', 'Entradas', 'Saídas', 'Saldo'],
           rows: safeRows.map((row) => [
             row.dia || '-',
