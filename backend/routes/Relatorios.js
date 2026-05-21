@@ -46,7 +46,7 @@ router.get('/:tipo', auth, pAdmin, async (req, res) => {
           rows: safeRows.map((row) => [
             row.periodo || '-',
             String(row.quantidade || 0),
-            \`R$ \${Number(row.receita || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}\`,
+            `R$ ${Number(row.receita || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
           ]),
         });
       }
@@ -243,13 +243,13 @@ router.get('/:tipo', auth, pAdmin, async (req, res) => {
         const safeRows = Array.isArray(rows) ? rows : [];
 
         return res.json({
-          summary: \`Fluxo de caixa dos últimos 30 dias com base em pagamentos recebidos e custos de reparo.\`,
+          summary: `Fluxo de caixa dos últimos 30 dias com base em pagamentos recebidos e custos de reparo.`,
           headers: ['Data', 'Entradas', 'Saídas', 'Saldo'],
           rows: safeRows.map((row) => [
             row.dia || '-',
-            \`R$ \${Number(row.entradas || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}\`,
-            \`R$ \${Number(row.saidas   || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}\`,
-            \`R$ \${Number(row.saldo    || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}\`,
+            `R$ ${Number(row.entradas || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+            `R$ ${Number(row.saidas   || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+            `R$ ${Number(row.saldo    || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
           ]),
         });
       }
