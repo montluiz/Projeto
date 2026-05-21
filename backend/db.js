@@ -1,25 +1,28 @@
 const mysql = require('mysql2');
 
-const connection = mysql.createConnection({
-  host:     process.env.DB_HOST,
-  user:     process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
-  port:     process.env.DB_PORT || 3306,
-  charset:  'utf8mb4',
+const pool = mysql.createPool({
+  host:               process.env.DB_HOST,
+  user:               process.env.DB_USER,
+  password:           process.env.DB_PASSWORD,
+  database:           process.env.DB_NAME,
+  port:               Number(process.env.DB_PORT) || 3306,
+  charset:            'utf8mb4',
+  waitForConnections: true,
+  connectionLimit:    10,
+  queueLimit:         0,
+  enableKeepAlive:    true,
+  keepAliveInitialDelay: 0,
 });
 
-connection.connect((err) => {
-  if (err) {
-    console.warn('⚠️ Banco não conectado:', err.message);
-    return;
-  }
+pool.getConnection((err, conn) => {
+  if (err) { console.warn('⚠️  Banco não conectado:', err.message); return; }
   console.log('✅ Conectado ao banco MySQL');
+  conn.release();
 });
 
 function q(sql, params) {
   return new Promise((resolve, reject) => {
-    connection.query(sql, params, (err, results) => {
+    pool.query(sql, params, (err, results) => {
       if (err) reject(err);
       else resolve(results);
     });
@@ -37,6 +40,6 @@ function buildSet(body, fields) {
   return { cols, vals };
 }
 
-module.exports = connection;
+module.exports = pool;
 module.exports.q = q;
 module.exports.buildSet = buildSet;

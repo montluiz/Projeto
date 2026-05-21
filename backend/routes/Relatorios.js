@@ -21,17 +21,12 @@ router.get('/:tipo', auth, pAdmin, async (req, res) => {
         const dataInicio = (data_inicio || '').trim();
         const dataFim    = (data_fim    || '').trim();
 
-        if (!dataInicio || !dataFim) {
-          return res.status(400).json({ error: 'Parâmetros data_inicio e data_fim são obrigatórios.' });
-        }
-
         const rows = await q(
           `SELECT DATE_FORMAT(data_venda, '%d/%m/%Y') AS periodo,
                   COUNT(*) AS quantidade,
                   COALESCE(SUM(valor_total), 0) AS receita
            FROM venda
-           WHERE status = 1
-             AND DATE(data_venda) BETWEEN ? AND ?
+           WHERE DATE(data_venda) BETWEEN ? AND ?
            GROUP BY DATE(data_venda)
            ORDER BY data_venda DESC`,
           [dataInicio, dataFim]
@@ -39,9 +34,12 @@ router.get('/:tipo', auth, pAdmin, async (req, res) => {
 
         const safeRows = Array.isArray(rows) ? rows : [];
         const totalTransacoes = safeRows.reduce((sum, row) => sum + Number(row.quantidade || 0), 0);
+        const totalReceita = safeRows.reduce((sum, row) => sum + Number(row.receita || 0), 0);
 
         return res.json({
-          summary: `Vendas realizadas entre ${dataInicio} e ${dataFim}. Total de ${safeRows.length} dia(s) com ${totalTransacoes} transações.`,
+          summary: safeRows.length
+            ? `${safeRows.length} dia(s) com vendas entre ${dataInicio} e ${dataFim}. Total: ${totalTransacoes} transações, R$ ${totalReceita.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}.`
+            : `Nenhuma venda encontrada entre ${dataInicio} e ${dataFim}.`,
           headers: ['Período', 'Quantidade', 'Receita'],
           rows: safeRows.map((row) => [
             row.periodo || '-',
@@ -217,7 +215,7 @@ router.get('/:tipo', auth, pAdmin, async (req, res) => {
         const rows = await q(
           `SELECT DATE_FORMAT(dia_ref, '%d/%m/%Y') AS dia,
                   COALESCE(SUM(entradas), 0) AS entradas,
-                  COALESCE(SUM(saidas),   0) AS saidas,
+                  COALESCE(SUM(saidas), 0)   AS saidas,
                   COALESCE(SUM(entradas), 0) - COALESCE(SUM(saidas), 0) AS saldo
            FROM (
              SELECT DATE(data_pagamento) AS dia_ref,
@@ -225,6 +223,7 @@ router.get('/:tipo', auth, pAdmin, async (req, res) => {
                     0 AS saidas
              FROM pagamento
              WHERE status = 'pago'
+               AND data_pagamento IS NOT NULL
                AND DATE(data_pagamento) >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)
              GROUP BY DATE(data_pagamento)
              UNION ALL
@@ -232,9 +231,11 @@ router.get('/:tipo', auth, pAdmin, async (req, res) => {
                     0 AS entradas,
                     COALESCE(SUM(custo), 0) AS saidas
              FROM reparo
-             WHERE DATE(data) >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)
+             WHERE data IS NOT NULL
+               AND DATE(data) >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)
              GROUP BY DATE(data)
            ) AS mov
+           WHERE dia_ref IS NOT NULL
            GROUP BY dia_ref
            ORDER BY dia_ref DESC
            LIMIT 30`
@@ -242,16 +243,10 @@ router.get('/:tipo', auth, pAdmin, async (req, res) => {
 
         const safeRows = Array.isArray(rows) ? rows : [];
 
-        if (safeRows.length === 0) {
-          return res.json({
-            summary: 'Nenhuma movimentação encontrada nos últimos 30 dias.',
-            headers: ['Data', 'Entradas', 'Saídas', 'Saldo'],
-            rows: [],
-          });
-        }
-
         return res.json({
-          summary: `Fluxo de caixa dos últimos 30 dias (${safeRows.length} dia(s) com movimento).`,
+          summary: safeRows.length
+            ? `Fluxo de caixa dos últimos 30 dias — ${safeRows.length} dia(s) com movimentação.`
+            : `Nenhuma movimentação registrada nos últimos 30 dias.`,
           headers: ['Data', 'Entradas', 'Saídas', 'Saldo'],
           rows: safeRows.map((row) => [
             row.dia || '-',
