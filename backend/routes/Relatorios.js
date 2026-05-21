@@ -18,6 +18,13 @@ router.get('/:tipo', auth, pAdmin, async (req, res) => {
   try {
     switch (tipo) {
       case 'vendas-periodo': {
+        const dataInicio = (data_inicio || '').trim();
+        const dataFim    = (data_fim    || '').trim();
+
+        if (!dataInicio || !dataFim) {
+          return res.status(400).json({ error: 'Parâmetros data_inicio e data_fim são obrigatórios.' });
+        }
+
         const rows = await q(
           `SELECT DATE_FORMAT(data_venda, '%d/%m/%Y') AS periodo,
                   COUNT(*) AS quantidade,
@@ -27,13 +34,20 @@ router.get('/:tipo', auth, pAdmin, async (req, res) => {
              AND DATE(data_venda) BETWEEN ? AND ?
            GROUP BY DATE(data_venda)
            ORDER BY data_venda DESC`,
-          [data_inicio, data_fim]
+          [dataInicio, dataFim]
         );
 
+        const safeRows = Array.isArray(rows) ? rows : [];
+        const totalTransacoes = safeRows.reduce((sum, row) => sum + Number(row.quantidade || 0), 0);
+
         return res.json({
-          summary: `Vendas realizadas entre ${data_inicio} e ${data_fim}. Total de ${rows.length} dia(s) com ${rows.reduce((sum, row) => sum + Number(row.quantidade), 0)} transações.`,
+          summary: `Vendas realizadas entre ${dataInicio} e ${dataFim}. Total de ${safeRows.length} dia(s) com ${totalTransacoes} transações.`,
           headers: ['Período', 'Quantidade', 'Receita'],
-          rows: rows.map((row) => [row.periodo, String(row.quantidade), `R$ ${Number(row.receita).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`]),
+          rows: safeRows.map((row) => [
+            row.periodo || '-',
+            String(row.quantidade || 0),
+            \`R$ \${Number(row.receita || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}\`,
+          ]),
         });
       }
 
@@ -202,9 +216,9 @@ router.get('/:tipo', auth, pAdmin, async (req, res) => {
       case 'fluxo-caixa-diario': {
         const rows = await q(
           `SELECT dia,
-                  SUM(entradas) AS entradas,
-                  SUM(saidas) AS saidas,
-                  SUM(entradas) - SUM(saidas) AS saldo
+                  COALESCE(SUM(entradas), 0) AS entradas,
+                  COALESCE(SUM(saidas),   0) AS saidas,
+                  COALESCE(SUM(entradas), 0) - COALESCE(SUM(saidas), 0) AS saldo
            FROM (
              SELECT DATE_FORMAT(data_pagamento, '%d/%m/%Y') AS dia,
                     COALESCE(SUM(valor), 0) AS entradas,
@@ -225,14 +239,17 @@ router.get('/:tipo', auth, pAdmin, async (req, res) => {
            ORDER BY STR_TO_DATE(dia, '%d/%m/%Y') DESC
            LIMIT 30`
         );
+
+        const safeRows = Array.isArray(rows) ? rows : [];
+
         return res.json({
-          summary: `Fluxo de caixa dos últimos 30 dias com base em pagamentos recebidos e custos de reparo.`,
+          summary: \`Fluxo de caixa dos últimos 30 dias com base em pagamentos recebidos e custos de reparo.\`,
           headers: ['Data', 'Entradas', 'Saídas', 'Saldo'],
-          rows: rows.map((row) => [
-            row.dia,
-            `R$ ${Number(row.entradas).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
-            `R$ ${Number(row.saidas).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
-            `R$ ${Number(row.saldo).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+          rows: safeRows.map((row) => [
+            row.dia || '-',
+            \`R$ \${Number(row.entradas || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}\`,
+            \`R$ \${Number(row.saidas   || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}\`,
+            \`R$ \${Number(row.saldo    || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}\`,
           ]),
         });
       }
