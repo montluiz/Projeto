@@ -116,7 +116,7 @@ export default function Produtos() {
   const lista = useMemo(() =>
     produtos.filter(p => {
       const q = search.toLowerCase();
-      return (p.nome.toLowerCase().includes(q) || String(p.id).includes(q))
+      return ((p.nome || "").toLowerCase().includes(q) || String(p.id).includes(q))
         && (!filterTipo || String(p.tipo) === filterTipo);
     }), [produtos, search, filterTipo]);
 

@@ -102,8 +102,8 @@ export default function Funcionarios() {
     funcionarios.filter(c => {
       const q = search.toLowerCase();
       return (
-        c.nome.toLowerCase().includes(q) ||
-        c.nome_cargo.toLowerCase().includes(q)
+        (c.nome || "").toLowerCase().includes(q) ||
+        (c.nome_cargo || "").toLowerCase().includes(q)
       );
     }), [funcionarios, search]);
 

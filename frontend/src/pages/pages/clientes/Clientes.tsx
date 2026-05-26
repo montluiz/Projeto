@@ -100,9 +100,9 @@ export default function Clientes() {
     clientes.filter(c => {
       const q = search.toLowerCase();
       return (
-        c.nome.toLowerCase().includes(q) ||
-        c.cpf_cnpj.toLowerCase().includes(q) ||
-        c.email.toLowerCase().includes(q) ||
+        (c.nome || "").toLowerCase().includes(q) ||
+        (c.cpf_cnpj || "").toLowerCase().includes(q) ||
+        (c.email || "").toLowerCase().includes(q) ||
         c.telefone.includes(q) ||
         String(c.id).includes(q)
       );

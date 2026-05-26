@@ -373,7 +373,7 @@ export default function Loja() {
   const frete = subtotal > 199 ? 0 : subtotal > 0 ? 19.9 : 0;
 
   const produtosFiltrados = produtos.filter(p => {
-    const okBusca = p.nome.toLowerCase().includes(busca.toLowerCase());
+    const okBusca = (p.nome || "").toLowerCase().includes(busca.toLowerCase());
     const okTipo = filtroTipo === "all" || String(p.tipo) === filtroTipo;
     return okBusca && okTipo;
   });

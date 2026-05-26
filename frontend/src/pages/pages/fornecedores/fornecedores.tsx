@@ -97,8 +97,8 @@ export default function Fornecedores() {
     fornecedores.filter(f => {
       const q = search.toLowerCase();
       return (
-        f.nome.toLowerCase().includes(q) ||
-        f.email.toLowerCase().includes(q) ||
+        (f.nome || "").toLowerCase().includes(q) ||
+        (f.email || "").toLowerCase().includes(q) ||
         f.telefone.includes(q) ||
         true
       );

@@ -129,8 +129,8 @@ export default function Vendas() {
         const q = search.toLowerCase();
         return (
           String(v.id).includes(q) ||
-          v.cliente_nome.toLowerCase().includes(q) ||
-          v.vendedor_nome.toLowerCase().includes(q)
+          (v.cliente_nome || "").toLowerCase().includes(q) ||
+          (v.vendedor_nome || "").toLowerCase().includes(q)
         );
       }),
     [vendas, search]

@@ -151,10 +151,10 @@ export default function Orcamentos() {
 
   const filtrado = useMemo(() =>
     lista.filter(o =>
-      o.cliente.toLowerCase().includes(search.toLowerCase()) ||
-      o.tecnico.toLowerCase().includes(search.toLowerCase()) ||
-      o.descricao.toLowerCase().includes(search.toLowerCase()) ||
-      o.dados.toLowerCase().includes(search.toLowerCase()) ||
+      (o.cliente || "").toLowerCase().includes(search.toLowerCase()) ||
+      (o.tecnico || "").toLowerCase().includes(search.toLowerCase()) ||
+      (o.descricao || "").toLowerCase().includes(search.toLowerCase()) ||
+      (o.dados || "").toLowerCase().includes(search.toLowerCase()) ||
       String(o.id).includes(search)
     ), [lista, search]
   );
